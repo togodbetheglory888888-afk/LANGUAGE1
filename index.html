@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+<meta charset="UTF-8">
+<title>Language 1 – Quarter 4 Week 1</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #fff4e6;
+}
+
+.center-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+}
+
+h1 { font-size: 46px; color: #d9642c; }
+
+button {
+  padding: 14px 28px;
+  font-size: 18px;
+  margin: 6px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.play-now {
+  background-color: #d9642c;
+  color: white;
+  font-size: 24px;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+  display: none;
+}
+
+.story {
+  background: #ffe4cc;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: justify;
+  font-size: 18px;
+}
+
+.feedback {
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.timer {
+  font-size: 22px;
+  font-weight: bold;
+  color: red;
+  margin-bottom: 15px;
+}
+
+.score {
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 20px;
+  color: #d9642c;
+}
+</style>
+</head>
+
+<body>
+
+<!-- START SCREEN -->
+<div class="center-screen" id="startScreen">
+  <h1>Language 1<br>Quarter 4 – Week 1</h1>
+  <button class="play-now" onclick="startGame()">Play Now</button>
+</div>
+
+<!-- GAME CONTENT -->
+<div class="container" id="gameContent">
+
+<div class="timer" id="timer">Time Left: 05:00</div>
+
+<h2>Si Maria</h2>
+
+<p class="story">
+Si Maria ay isang mag-aaral na mahilig sa pagbabasa ng mga kwento. Isang araw, binasa niya ang isang kwento tungkol sa isang batang babae na nagngangalang Sophia. Si Maria ay napangiti at ginamit ang kanyang sariling mga salita upang ibahagi ito sa kanyang mga kaibigan.
+</p>
+
+<!-- QUESTIONS -->
+<div id="questions">
+
+<h3>1. Sino ang batang mahilig magbasa ng kwento?</h3>
+<button onclick="checkAnswer(1,'A')">A. Si Maria</button>
+<button onclick="checkAnswer(1,'B')">B. Si Sophia</button>
+<button onclick="checkAnswer(1,'C')">C. Si Anna</button>
+<button onclick="checkAnswer(1,'D')">D. Si Emily</button>
+<p class="feedback" id="fb1"></p>
+
+<h3>2. Tungkol saan ang binasang kwento ni Maria?</h3>
+<button onclick="checkAnswer(2,'A')">A. Tungkol sa batang babae na may kapangyarihan sa halaman</button>
+<button onclick="checkAnswer(2,'B')">B. Tungkol sa batang babae na ayaw pumasok sa paaralan</button>
+<button onclick="checkAnswer(2,'C')">C. Tungkol sa batang inian ng mga magulang</button>
+<button onclick="checkAnswer(2,'D')">D. Tungkol sa mag-aaral na takot sa kanyang mga kaklase</button>
+<p class="feedback" id="fb2"></p>
+
+<h3>3. Paano nagamit ni Maria ang sariling salita?</h3>
+<button onclick="checkAnswer(3,'A')">A. Ikwinento nya itong muli sa pinaka madaling paraang alam nya gamit ang sarili nyang salita</button>
+<button onclick="checkAnswer(3,'B')">B. Binasa nya ulit ang laman ng libro</button>
+<button onclick="checkAnswer(3,'C')">C. Nagpatulong siya sa iba nyang kaklase</button>
+<button onclick="checkAnswer(3,'D')">D. Nagpatulong siya sa kanyang guro</button>
+<p class="feedback" id="fb3"></p>
+
+<h3>4. Ano ang benepisyo ng sariling salita sa pagkukwentong muli?</h3>
+<button onclick="checkAnswer(4,'A')">A. Mas madali mong mauunawaan ang impormasyon</button>
+<button onclick="checkAnswer(4,'B')">B. Mas madaling mauunawan ng mga taga pakinig</button>
+<button onclick="checkAnswer(4,'C')">C. Nagpapakita ng kritikal na pag-iisip at pag-unawa</button>
+<button onclick="checkAnswer(4,'D')">D. Lahat ng nabanggit</button>
+<p class="feedback" id="fb4"></p>
+
+<h3>5. Kung ikaw si Maria, gagawin mo rin ba ang ginawa niya? Bakit?</h3>
+<button onclick="checkAnswer(5,'A')">A. Opo upang mas madaling maunawaan ang aking sinasabi</button>
+<button onclick="checkAnswer(5,'B')">B. Hindi po, dahil nakakatamad mag isip pa</button>
+<button onclick="checkAnswer(5,'C')">C. Siguro po upang magpakitang gilas sa mga kaklase</button>
+<button onclick="checkAnswer(5,'D')">D. Wala sa mga nabanggit</button>
+<p class="feedback" id="fb5"></p>
+
+</div>
+
+<div class="score" id="finalScore"></div>
+
+<button onclick="restartGame()">Please Try Again</button>
+
+</div>
+
+<script>
+// Correct answers
+const answers = {1:'A',2:'A',3:'A',4:'A',5:'A'};
+
+let score = 0;
+let answered = {};
+let timeLeft = 300;
+let timerInterval;
+
+function startGame(){
+  document.getElementById("startScreen").style.display="none";
+  document.getElementById("gameContent").style.display="block";
+  startTimer();
+}
+
+function startTimer(){
+  timerInterval = setInterval(()=>{
+    timeLeft--;
+    let min = String(Math.floor(timeLeft/60)).padStart(2,'0');
+    let sec = String(timeLeft%60).padStart(2,'0');
+    document.getElementById("timer").textContent = `Time Left: ${min}:${sec}`;
+    if(timeLeft<=0){
+      clearInterval(timerInterval);
+      endGame();
+    }
+  },1000);
+}
+
+function speak(text){
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.lang="en-US";
+  speechSynthesis.speak(msg);
+}
+
+function checkAnswer(q,choice){
+  if(answered[q]) return;
+  answered[q]=true;
+  const fb=document.getElementById("fb"+q);
+
+  if(choice===answers[q]){
+    fb.textContent="✅ Correct!";
+    fb.style.color="green";
+    score++;
+    speak("Correct");
+  } else {
+    fb.textContent=`❌ Try again | Correct answer: ${answers[q]}`;
+    fb.style.color="red";
+    speak("Try again");
+  }
+
+  if(Object.keys(answered).length===5){
+    endGame();
+  }
+}
+
+function endGame(){
+  clearInterval(timerInterval);
+  document.getElementById("finalScore").textContent =
+    `Your Total Score: ${score} / 5`;
+}
+
+function restartGame(){
+  location.reload();
+}
+</script>
+
+</body>
+</html>
